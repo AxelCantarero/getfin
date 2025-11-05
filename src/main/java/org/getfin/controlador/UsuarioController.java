@@ -11,11 +11,24 @@ public class UsuarioController {
 
     private static UsuarioController instance;
 
-    // Reutilizamos el mismo servicio para evitar múltiples instancias
-    private final IGenericService<Usuario> usuarioService;
+    public UsuarioController(){
 
-    private UsuarioController() {
-        usuarioService = new GenericServiceImpl<>(Usuario.class, HibernateUtil.getSessionFactory());
+    }
+    public void guardarCliente(Usuario usuario){
+        IGenericService<Usuario> clientes = new GenericServiceImpl<>(Usuario.class, HibernateUtil.getSessionFactory());
+        clientes.save(usuario);
+    }
+    public void eliminarCliente(Usuario cliente){
+        IGenericService<Usuario> clientes = new GenericServiceImpl<>(Usuario.class, HibernateUtil.getSessionFactory());
+        clientes.delete(cliente);
+    }
+    public void editarCliente(Usuario cliente){
+        IGenericService<Usuario> clientes = new GenericServiceImpl<>(Usuario.class, HibernateUtil.getSessionFactory());
+        clientes.update(cliente);
+    }
+    public List<Usuario> getClientes() {
+        IGenericService<Usuario> clienteIGenericService= new GenericServiceImpl<>(Usuario.class, HibernateUtil.getSessionFactory());
+        return clienteIGenericService.getAll();
     }
 
     public static UsuarioController getInstance() {
@@ -25,24 +38,5 @@ public class UsuarioController {
         return instance;
     }
 
-    public void guardaUsuario(Usuario usuario) {
-        usuarioService.save(usuario);
-    }
 
-    public void eliminaUsuario(Usuario usuario) {
-        usuarioService.delete(usuario);
-    }
-
-    public void editaUsuario(Usuario usuario) {
-        usuarioService.update(usuario);
-    }
-
-    public List<Usuario> getUsuarios() {
-        return usuarioService.getAll();
-    }
-
-    // 🚀 Nuevo método: obtener usuario por nombre
-    public Usuario getUsuarioPorNombre(String nombreUsuario) {
-        return usuarioService.getByName(nombreUsuario);
-    }
 }

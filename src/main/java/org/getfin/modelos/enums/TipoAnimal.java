@@ -1,0 +1,6 @@
+package org.getfin.modelos.enums;
+
+public enum TipoAnimal {
+    BOVINOS, PORCINOS, CAPRINOS, OVINOS, AVES_DE_CORRAL, EQUINOS, CANINOS,
+    FELINOS, PECES, CONEJOS, AVES_ORNAMENTALES, ABEJAS
+}

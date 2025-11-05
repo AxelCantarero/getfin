@@ -8,6 +8,6 @@ public interface IGenericService<T> extends IGenericDAO<T> {
     List<T> getAll();
     void deleteAll();
     T getById(int id);
-    T getId(Long id);
+    T getId(Integer id);
     T getByName(String name);
 }

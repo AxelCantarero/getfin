@@ -28,11 +28,6 @@ public class GenericDAOImpl<T> implements  IGenericDAO<T>{
     }
 
     @Override
-    public T get(Class<T> cl, Long id) {
-        return null;
-    }
-
-    @Override
     public T save(T object) {
         Session session = sessionFactory.openSession();
         session.beginTransaction();

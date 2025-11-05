@@ -1,5 +1,6 @@
 package org.getfin.controlador;
 
+import org.getfin.modelos.Transaccion;
 import org.getfin.modelos.Usuario;
 import org.getfin.servicios.GenericServiceImpl;
 import org.getfin.servicios.IGenericService;
@@ -7,16 +8,16 @@ import org.getfin.util.HibernateUtil;
 
 import java.util.List;
 
-public class LoginController {
+public class TransaccionController {
 
-    private static LoginController instance;
+    private static TransaccionController instance;
 
-    public LoginController(){
+    public TransaccionController(){
 
     }
-    public void guardarCliente(Usuario usuario){
-        IGenericService<Usuario> clientes = new GenericServiceImpl<>(Usuario.class, HibernateUtil.getSessionFactory());
-        clientes.save(usuario);
+    public void guardarTransaccion(Transaccion transaccion){
+        IGenericService<Transaccion> clientes = new GenericServiceImpl<>(Transaccion.class, HibernateUtil.getSessionFactory());
+        clientes.save(transaccion);
     }
     public void eliminarCliente(Usuario cliente){
         IGenericService<Usuario> clientes = new GenericServiceImpl<>(Usuario.class, HibernateUtil.getSessionFactory());
@@ -31,12 +32,10 @@ public class LoginController {
         return clienteIGenericService.getAll();
     }
 
-    public static LoginController getInstance() {
+    public static TransaccionController getInstance() {
         if (instance == null) {
-            instance = new LoginController();
+            instance = new TransaccionController();
         }
         return instance;
     }
-
-
 }

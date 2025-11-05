@@ -1,42 +1,108 @@
 package org.getfin.modelos;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.getfin.modelos.enums.EstadoAnimal;
+import org.getfin.modelos.enums.TipoAnimal;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "animales")
-@Data
-@NoArgsConstructor
 public class Animal {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idAnimal;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idAnimal;
 
-    @Column(nullable = false)
-    private String chapa;
+    private String nombre;
 
-    @Column(nullable = false)
-    private LocalDate fechaAdquisicion;
+    @Column(unique = true)
+    private String identificador;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private EstadoAnimal estado;
-    public enum EstadoAnimal { cria, desarrollo, produccion, vendido, muerto, extraviado }
+    private TipoAnimal tipo = TipoAnimal.BOVINOS;
 
-    @ManyToOne
-    @JoinColumn(name = "idEspecie", nullable = false)
-    private Especies especies;
+    private Integer cantidad;
+    private BigDecimal pesoPromedio;
+    private String descripcion;
 
-    @OneToMany(mappedBy = "animal")
-    private List<DetalleIngreso> detallesIngresos;
+    @Enumerated(EnumType.STRING)
+    private EstadoAnimal estado = EstadoAnimal.DISPONIBLE;
 
-    public Animal(String chapa, LocalDate fechaAdquisicion, EstadoAnimal estado, Especies especies) {
-        this.chapa = chapa;
-        this.fechaAdquisicion = fechaAdquisicion;
+    public Animal() {
+    }
+
+    public Animal(String nombre, String identificador, TipoAnimal tipo, Integer cantidad, BigDecimal pesoPromedio, String descripcion, EstadoAnimal estado) {
+        this.nombre = nombre;
+        this.identificador = identificador;
+        this.tipo = tipo;
+        this.cantidad = cantidad;
+        this.pesoPromedio = pesoPromedio;
+        this.descripcion = descripcion;
         this.estado = estado;
-        this.especies = especies;
+    }
+
+    public Long getIdAnimal() {
+        return idAnimal;
+    }
+
+    public void setIdAnimal(Long idAnimal) {
+        this.idAnimal = idAnimal;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getIdentificador() {
+        return identificador;
+    }
+
+    public void setIdentificador(String identificador) {
+        this.identificador = identificador;
+    }
+
+    public TipoAnimal getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(TipoAnimal tipo) {
+        this.tipo = tipo;
+    }
+
+    public Integer getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(Integer cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public BigDecimal getPesoPromedio() {
+        return pesoPromedio;
+    }
+
+    public void setPesoPromedio(BigDecimal pesoPromedio) {
+        this.pesoPromedio = pesoPromedio;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public EstadoAnimal getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoAnimal estado) {
+        this.estado = estado;
     }
 }
+

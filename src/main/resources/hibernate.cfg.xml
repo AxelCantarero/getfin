@@ -9,20 +9,13 @@
         <property name="show_sql">true</property>
         <property name="format_sql">true</property>
         <property name="current_session_context_class">thread</property>
-        <property name="hbm2ddl.auto">update</property>
-        <mapping class="org.getfin.modelos.Usuario"/>
+        <property name="hbm2ddl.auto">create-drop
+        </property>
+        <mapping class="org.getfin.modelos.Transaccion"/>
         <mapping class="org.getfin.modelos.Animal"/>
-        <mapping class="org.getfin.modelos.AnimalAgrupado"/>
-        <mapping class="org.getfin.modelos.Cliente"/>
-        <mapping class="org.getfin.modelos.DetalleEgreso"/>
-        <mapping class="org.getfin.modelos.DetalleIngreso"/>
-        <mapping class="org.getfin.modelos.Egreso"/>
-        <mapping class="org.getfin.modelos.Herramienta"/>
-        <mapping class="org.getfin.modelos.Ingreso"/>
-        <mapping class="org.getfin.modelos.MovimientoInventario"/>
+        <maping class="org.getfin.modelos.Cultivo"/>
+        <maping class="org.getfin.modelos.Visita"/>
         <mapping class="org.getfin.modelos.Producto"/>
-        <mapping class="org.getfin.modelos.Especies"/>
-
-
+        <mapping class="org.getfin.modelos.Usuario"/>
     </session-factory>
 </hibernate-configuration>

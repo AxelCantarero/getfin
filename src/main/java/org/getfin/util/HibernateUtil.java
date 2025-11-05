@@ -5,7 +5,6 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,7 +20,6 @@ public class HibernateUtil {
             try {
                 registry = new StandardServiceRegistryBuilder().configure().build();
                 MetadataSources sources = new MetadataSources(registry);
-
                 MetadataSources metadataSources = new MetadataSources(registry);
                 Metadata metadata = sources.getMetadataBuilder().build();
                 sessionFactory = metadata.getSessionFactoryBuilder().build();
@@ -31,12 +29,10 @@ public class HibernateUtil {
                     StandardServiceRegistryBuilder.destroy(registry);
                 }
             }
-
         }
-
-
         return sessionFactory;
     }
+
     public static boolean isSessionFactoryAvailable() {
         try {
             return getSessionFactory() != null;

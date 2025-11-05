@@ -1,36 +1,62 @@
 package org.getfin.modelos;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.getfin.modelos.enums.Rol;
 
 @Entity
 @Table(name = "usuarios")
-@Data
-@NoArgsConstructor
 public class Usuario {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idUsuario;
+    private Long idUsuario;
 
-    @Column(nullable = false, unique = true, name = "nombre")
+    @Column(nullable = false, unique = true)
     private String nombreUsuario;
 
     @Column(nullable = false)
     private String contrasena;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Rol rol;
+    private Rol rol = Rol.DOCENTE;
 
-    public enum Rol {
-        admin
+    public Usuario() {
     }
 
     public Usuario(String nombreUsuario, String contrasena, Rol rol) {
         this.nombreUsuario = nombreUsuario;
         this.contrasena = contrasena;
+        this.rol = rol;
+    }
+
+    public Long getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(Long idUsuario) {
+        this.idUsuario = idUsuario;
+    }
+
+    public String getNombreUsuario() {
+        return nombreUsuario;
+    }
+
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
+    }
+
+    public String getContrasena() {
+        return contrasena;
+    }
+
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
+    }
+
+    public Rol getRol() {
+        return rol;
+    }
+
+    public void setRol(Rol rol) {
         this.rol = rol;
     }
 }

@@ -34,7 +34,7 @@ public class GenericServiceImpl<T> implements IGenericService<T> {
     }
 
     @Override
-    public T getId(Long id) {
+    public T getId(Integer id) {
         return dao.get(cl,id);
     }
 
@@ -55,11 +55,6 @@ public class GenericServiceImpl<T> implements IGenericService<T> {
     @Override
     public T get(Class<T> cl, Integer id) {
         return (T) dao.get(cl,id);
-    }
-
-    @Override
-    public T get(Class<T> cl, Long id) {
-        return null;
     }
 
     @Override
