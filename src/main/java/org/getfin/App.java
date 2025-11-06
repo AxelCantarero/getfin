@@ -7,9 +7,7 @@ public class App {
     public static void main(String[] args) {
 
 
-        //new loginVista();
-         new ventanaPrincipal();
-
+        new loginVista();
 
 
     }

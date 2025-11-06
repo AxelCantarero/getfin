@@ -2,6 +2,7 @@ package org.getfin.modelos;
 
 import jakarta.persistence.*;
 import org.getfin.modelos.enums.TipoTransaccion;
+import org.getfin.modelos.Cultivo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -24,6 +25,7 @@ public class Transaccion {
     private BigDecimal iva;
     private BigDecimal retencion;
     private BigDecimal total;
+    private String numeroFactura;
 
     @ManyToOne
     @JoinColumn(name = "idProducto")
@@ -40,8 +42,7 @@ public class Transaccion {
     public Transaccion() {
     }
 
-    public Transaccion(Long idTransaccion, TipoTransaccion tipo, String descripcion, String nombreCliente, LocalDate fecha, BigDecimal cantidad, BigDecimal precioUnitario, BigDecimal iva, BigDecimal retencion, BigDecimal total, Producto producto) {
-        this.idTransaccion = idTransaccion;
+    public Transaccion(TipoTransaccion tipo, String descripcion, String nombreCliente, LocalDate fecha, BigDecimal cantidad, BigDecimal precioUnitario, BigDecimal iva, BigDecimal retencion, BigDecimal total, String numeroFactura, Producto producto) {
         this.tipo = tipo;
         this.descripcion = descripcion;
         this.nombreCliente = nombreCliente;
@@ -51,35 +52,36 @@ public class Transaccion {
         this.iva = iva;
         this.retencion = retencion;
         this.total = total;
+        this.numeroFactura = numeroFactura;
         this.producto = producto;
     }
 
-    public Transaccion(Long idTransaccion, String nombreCliente, TipoTransaccion tipo, String descripcion, LocalDate fecha, BigDecimal cantidad, BigDecimal precioUnitario, BigDecimal iva, BigDecimal retencion, BigDecimal total, Cultivo cultivo) {
-        this.idTransaccion = idTransaccion;
-        this.nombreCliente = nombreCliente;
+    public Transaccion(TipoTransaccion tipo, String descripcion, String nombreCliente, Cultivo cultivo, String numeroFactura, BigDecimal total, BigDecimal retencion, BigDecimal cantidad, LocalDate fecha, BigDecimal precioUnitario, BigDecimal iva) {
         this.tipo = tipo;
         this.descripcion = descripcion;
-        this.fecha = fecha;
+        this.nombreCliente = nombreCliente;
+        this.cultivo = cultivo;
+        this.numeroFactura = numeroFactura;
+        this.total = total;
+        this.retencion = retencion;
         this.cantidad = cantidad;
+        this.fecha = fecha;
         this.precioUnitario = precioUnitario;
         this.iva = iva;
-        this.retencion = retencion;
-        this.total = total;
-        this.cultivo = cultivo;
     }
 
-    public Transaccion(Long idTransaccion, BigDecimal total, BigDecimal retencion, BigDecimal iva, BigDecimal precioUnitario, BigDecimal cantidad, LocalDate fecha, String nombreCliente, String descripcion, TipoTransaccion tipo, Animal animal) {
-        this.idTransaccion = idTransaccion;
+    public Transaccion(Animal animal, String numeroFactura, BigDecimal total, BigDecimal retencion, BigDecimal precioUnitario, BigDecimal iva, BigDecimal cantidad, LocalDate fecha, String nombreCliente, TipoTransaccion tipo, String descripcion) {
+        this.animal = animal;
+        this.numeroFactura = numeroFactura;
         this.total = total;
         this.retencion = retencion;
-        this.iva = iva;
         this.precioUnitario = precioUnitario;
+        this.iva = iva;
         this.cantidad = cantidad;
         this.fecha = fecha;
         this.nombreCliente = nombreCliente;
-        this.descripcion = descripcion;
         this.tipo = tipo;
-        this.animal = animal;
+        this.descripcion = descripcion;
     }
 
     public Long getIdTransaccion() {
@@ -184,5 +186,13 @@ public class Transaccion {
 
     public void setAnimal(Animal animal) {
         this.animal = animal;
+    }
+
+    public String getNumeroFactura() {
+        return numeroFactura;
+    }
+
+    public void setNumeroFactura(String numeroFactura) {
+        this.numeroFactura = numeroFactura;
     }
 }

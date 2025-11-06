@@ -1,10 +1,15 @@
 package org.getfin.vistas.Login;
+import org.getfin.vistas.contenidoPrincipal.ventanaPrincipal;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class loginVista extends JFrame {
+public class loginVista extends JFrame  {
 
     public loginVista() {
+
         mostrar();
     }
 
@@ -68,6 +73,7 @@ public class loginVista extends JFrame {
         botonLogin.setBackground(new Color(83,102,119));
         botonLogin.setForeground(new Color(255,255,252));
 
+
         JButton botonCancelar = new JButton("Cancelar");
         botonCancelar.setBackground(new Color(83,102,119));
         botonCancelar.setForeground(new Color(255,255,252));
@@ -79,10 +85,23 @@ public class loginVista extends JFrame {
         formulario.add(botonLogin);
         formulario.add(botonCancelar);
 
+
         Centro.add(formulario);
-        // Ahora sí se muestra correctamente
         setVisible(true);
+
+        botonLogin.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(textUsuario.getText().equals("axel") && textContrasena.getText().equals("123")){
+                    new ventanaPrincipal();
+                    dispose();
+
+                }
+            }
+        });
+        botonCancelar.addActionListener(e->dispose());
     }
+
 
 
 }

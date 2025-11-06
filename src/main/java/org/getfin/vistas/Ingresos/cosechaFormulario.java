@@ -13,7 +13,7 @@ public class cosechaFormulario extends JFrame {
     private void initFormulario() {
         setTitle("Cosecha - Formulario de Registro");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(900, 600);
+        setSize(750, 500);
         setLocationRelativeTo(null);
 
         // PANEL PRINCIPAL (usa GridBagLayout)
@@ -31,11 +31,11 @@ public class cosechaFormulario extends JFrame {
         JDateChooser campoFecha = new JDateChooser();
         panelIzquierdo.add(campoFecha);
 
-        panelIzquierdo.add(new JLabel("Tipo de Producto:"));
+        panelIzquierdo.add(new JLabel("Categoria:"));
         JTextField campoTipoProducto = new JTextField();
         panelIzquierdo.add(campoTipoProducto);
 
-        panelIzquierdo.add(new JLabel("Producto:"));
+        panelIzquierdo.add(new JLabel("Cultivos:"));
         JTextField campoProducto = new JTextField();
         panelIzquierdo.add(campoProducto);
 
@@ -109,7 +109,7 @@ public class cosechaFormulario extends JFrame {
             dispose();
         });
 
-        // === AGREGAR PANEL PRINCIPAL AL FRAME ===
+
         add(mainPanel);
         setVisible(true);
     }
