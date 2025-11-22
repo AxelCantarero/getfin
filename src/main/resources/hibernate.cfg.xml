@@ -12,8 +12,8 @@
         <property name="hbm2ddl.auto">create-drop</property>
         <mapping class="org.getfin.modelos.Transaccion"/>
         <mapping class="org.getfin.modelos.Animal"/>
-        <maping class="org.getfin.modelos.Cultivo"/>
-        <maping class="org.getfin.modelos.Visita"/>
+        <mapping class="org.getfin.modelos.Cultivo"/>
+        <mapping class="org.getfin.modelos.Visita"/>
         <mapping class="org.getfin.modelos.Producto"/>
         <mapping class="org.getfin.modelos.Usuario"/>
     </session-factory>
