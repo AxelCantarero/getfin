@@ -15,19 +15,19 @@ public class VisitaController {
     public VisitaController(){
 
     }
-    public void guardarCultivo(Visita visita){
+    public void guardarVisita(Visita visita){
         IGenericService<Visita> cliente = new GenericServiceImpl<>(Visita.class, HibernateUtil.getSessionFactory());
         cliente.save(visita);
     }
-    public void eliminarCultivo(Visita visita){
+    public void eliminarVisita(Visita visita){
         IGenericService<Visita> cliente = new GenericServiceImpl<>(Visita.class, HibernateUtil.getSessionFactory());
         cliente.delete(visita);
     }
-    public void editarCultivo(Visita visita){
+    public void editarVisita(Visita visita){
         IGenericService<Visita> cliente = new GenericServiceImpl<>(Visita.class, HibernateUtil.getSessionFactory());
         cliente.update(visita);
     }
-    public List<Visita> getCultivo() {
+    public List<Visita> getVisita() {
         IGenericService<Visita> clienteIGenericService= new GenericServiceImpl<>(Visita.class, HibernateUtil.getSessionFactory());
         return clienteIGenericService.getAll();
     }
