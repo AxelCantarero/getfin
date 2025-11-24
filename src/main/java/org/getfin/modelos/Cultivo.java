@@ -17,7 +17,7 @@ public class Cultivo {
     private String nombreCultivo;
     private LocalDate fechaSiembra;
     private LocalDate fechaCosecha;
-    private BigDecimal areaSembrada;
+    private String areaSembrada;
 
     @Enumerated(EnumType.STRING)
     private CategoriaCultivo categoria = CategoriaCultivo.GRANOS_BASICOS;
@@ -31,7 +31,7 @@ public class Cultivo {
     public Cultivo() {
     }
 
-    public Cultivo(String nombreCultivo, LocalDate fechaSiembra, LocalDate fechaCosecha, BigDecimal areaSembrada, CategoriaCultivo categoria, EstadoCultivo estado, BigDecimal stock, BigDecimal montoInicial) {
+    public Cultivo(String nombreCultivo, LocalDate fechaSiembra, LocalDate fechaCosecha, String areaSembrada, CategoriaCultivo categoria, EstadoCultivo estado, BigDecimal stock, BigDecimal montoInicial) {
         this.nombreCultivo = nombreCultivo;
         this.fechaSiembra = fechaSiembra;
         this.fechaCosecha = fechaCosecha;
@@ -74,11 +74,11 @@ public class Cultivo {
         this.fechaCosecha = fechaCosecha;
     }
 
-    public BigDecimal getAreaSembrada() {
+    public String getAreaSembrada() {
         return areaSembrada;
     }
 
-    public void setAreaSembrada(BigDecimal areaSembrada) {
+    public void setAreaSembrada(String areaSembrada) {
         this.areaSembrada = areaSembrada;
     }
 

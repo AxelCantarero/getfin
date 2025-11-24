@@ -15,19 +15,19 @@ public class ProductoController {
     public ProductoController(){
 
     }
-    public void guardarCultivo(Producto producto){
+    public void guardarProducto(Producto producto){
         IGenericService<Producto> cliente = new GenericServiceImpl<>(Producto.class, HibernateUtil.getSessionFactory());
         cliente.save(producto);
     }
-    public void eliminarCultivo(Producto producto){
+    public void eliminarProducto(Producto producto){
         IGenericService<Producto> cliente = new GenericServiceImpl<>(Producto.class, HibernateUtil.getSessionFactory());
         cliente.delete(producto);
     }
-    public void editarCultivo(Producto producto){
+    public void editarProducto(Producto producto){
         IGenericService<Producto> cliente = new GenericServiceImpl<>(Producto.class, HibernateUtil.getSessionFactory());
         cliente.update(producto);
     }
-    public List<Producto> getCultivo() {
+    public List<Producto> getProducto() {
         IGenericService<Producto> clienteIGenericService= new GenericServiceImpl<>(Producto.class, HibernateUtil.getSessionFactory());
         return clienteIGenericService.getAll();
     }

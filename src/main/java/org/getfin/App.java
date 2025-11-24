@@ -19,7 +19,7 @@ public class App {
                 "Maíz Amarillo",                       // nombreCultivo
                 LocalDate.of(2025, 5, 10),             // fechaSiembra
                 LocalDate.of(2025, 9, 25),             // fechaCosecha
-                new BigDecimal("2.5"),                 // área sembrada en manzanas o hectáreas
+                new String("2.5"),                 // área sembrada en manzanas o hectáreas
                 CategoriaCultivo.GRANOS_BASICOS,       // categoría
                 EstadoCultivo.CRECIMIENTO,             // estado
                 new BigDecimal("1500.00"),             // stock disponible en kg
