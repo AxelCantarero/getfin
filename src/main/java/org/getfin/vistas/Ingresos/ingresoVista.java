@@ -1,22 +1,29 @@
 package org.getfin.vistas.Ingresos;
 
+import org.getfin.controlador.TransaccionController;
+import org.getfin.modelos.Transaccion;
+
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ingresoVista extends JPanel implements ActionListener {
 
     private JButton botonAgregar;
+    private JTable tabla;
+    private DefaultTableModel modeloTabla;
 
     public ingresoVista() {
-
         ventanaIngreso();
     }
 
     private void ventanaIngreso() {
+
         setLayout(new BorderLayout(10, 10));
 
         // ---------- 1️⃣ ENCABEZADO ----------
@@ -25,12 +32,14 @@ public class ingresoVista extends JPanel implements ActionListener {
         label.setFont(new Font("Arial", Font.BOLD, 20));
         superiorPanel.add(label, BorderLayout.WEST);
 
+        // Botón agregar ingreso
         botonAgregar = new JButton("Agregar Ingreso");
         botonAgregar.addActionListener(this);
         superiorPanel.add(botonAgregar, BorderLayout.EAST);
+
         add(superiorPanel, BorderLayout.NORTH);
 
-        // ---------- 2️⃣ PANEL CENTRAL (formulario + tabla + resumen) ----------
+        // ---------- 2️⃣ PANEL CENTRAL ----------
         JPanel centroPanel = new JPanel(new BorderLayout(10, 10));
         add(centroPanel, BorderLayout.CENTER);
 
@@ -51,33 +60,34 @@ public class ingresoVista extends JPanel implements ActionListener {
 
         centroPanel.add(formularioPanel, BorderLayout.NORTH);
 
-        // ---------- 4️⃣ TABLA ----------
-        String[] columnas = {"ID", "Tipo", "Fecha", "Cliente", "Monto", "Descripción", "Estado"};
-        Object[][] datos = {
-                {1, "Venta", "2025-10-07", "Juan Pérez", 250.0, "Venta de maíz", "Completado"},
-                {2, "Donación", "2025-10-07", "Fundación ABC", 100.0, "Apoyo social", "Pendiente"},
-                {3, "Venta", "2025-10-07", "Carlos Ruiz", 150.0, "Venta de frijol", "Completado"}
+        // ---------- 4️⃣ TABLA REAL CON TRANSACCIONES ----------
+        String[] columnas = {
+                "ID", "Tipo", "Fecha", "Cliente", "Descripción",
+                "Cantidad", "Precio U.", "Total", "Factura", "Referencia"
         };
 
-        JTable tabla = new JTable(datos, columnas);
-        JScrollPane scroll = new JScrollPane(tabla);
+        modeloTabla = new DefaultTableModel(columnas, 0);
+        tabla = new JTable(modeloTabla);
 
+        JScrollPane scroll = new JScrollPane(tabla);
         centroPanel.add(scroll, BorderLayout.CENTER);
 
-        // ---------- 5️⃣ PANEL DE RESUMEN ----------
+        // Cargar datos reales
+        actualizarTabla();
+
+        // ---------- 5️⃣ RESUMEN DEL MES ----------
         JPanel resumenPanel = new JPanel();
         resumenPanel.setLayout(new BoxLayout(resumenPanel, BoxLayout.Y_AXIS));
         resumenPanel.setBorder(BorderFactory.createTitledBorder("Resumen del mes"));
         resumenPanel.setPreferredSize(new Dimension(200, 0)); // ancho fijo
 
-        // Datos de ejemplo
+        // Datos simulados del resumen
         String mes = "Octubre 2025";
         double total = 500.0;
         Map<String, Double> totalesPorTipo = new LinkedHashMap<>();
         totalesPorTipo.put("Ventas", 400.0);
         totalesPorTipo.put("Donaciones", 100.0);
 
-        // Componentes del resumen
         resumenPanel.add(new JLabel("Mes: " + mes));
         resumenPanel.add(Box.createVerticalStrut(5));
         resumenPanel.add(new JLabel("Total general: $" + total));
@@ -87,16 +97,42 @@ public class ingresoVista extends JPanel implements ActionListener {
             resumenPanel.add(new JLabel("• " + entry.getKey() + ": $" + entry.getValue()));
         }
 
-        // Agregar resumen a la derecha del centro
         centroPanel.add(resumenPanel, BorderLayout.EAST);
+    }
+
+    public void actualizarTabla() {
+        modeloTabla.setRowCount(0);
+
+        List<Transaccion> lista = TransaccionController.getInstance().getTransacciones();
+
+        for (Transaccion t : lista) {
+            String referencia = "";
+            if (t.getProducto() != null) referencia = t.getProducto().getNombreProducto();
+            if (t.getCultivo() != null) referencia = t.getCultivo().getNombreCultivo();
+            if (t.getAnimal() != null) referencia = t.getAnimal().getNombre();
+
+            modeloTabla.addRow(new Object[]{
+                    t.getIdTransaccion(),
+                    t.getTipo(),
+                    t.getFecha(),
+                    t.getNombreCliente(),
+                    t.getDescripcion(),
+                    t.getCantidad(),
+                    t.getPrecioUnitario(),
+                    t.getTotal(),
+                    t.getNumeroFactura(),
+                    referencia
+            });
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == botonAgregar) {
-            // ✅ Abre el formulario
-            new IngresoSeleccionMenu().setVisible(true);
-        }
 
+            // 🔥 Abrir menú para seleccionar tipo de ingreso
+            IngresoSeleccionMenu menu = new IngresoSeleccionMenu();
+            menu.setVisible(true);
+        }
     }
 }

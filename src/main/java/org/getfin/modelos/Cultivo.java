@@ -113,4 +113,6 @@ public class Cultivo {
     public void setMontoInicial(BigDecimal montoInicial) {
         this.montoInicial = montoInicial;
     }
+
+
 }

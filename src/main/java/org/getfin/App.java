@@ -1,9 +1,13 @@
 package org.getfin;
 
+import org.getfin.controlador.AnimalController;
 import org.getfin.controlador.CultivoController;
+import org.getfin.modelos.Animal;
 import org.getfin.modelos.Cultivo;
 import org.getfin.modelos.enums.CategoriaCultivo;
+import org.getfin.modelos.enums.EstadoAnimal;
 import org.getfin.modelos.enums.EstadoCultivo;
+import org.getfin.modelos.enums.TipoAnimal;
 import org.getfin.vistas.Login.loginVista;
 import org.getfin.vistas.contenidoPrincipal.ventanaPrincipal;
 
@@ -27,8 +31,18 @@ public class App {
         );
         CultivoController.getInstance().guardarCultivo(cultivoMaiz);
 
-        new loginVista();
+        Animal animalVaca = new Animal(
+                "panda",
+                "a3ds",
+                TipoAnimal.BOVINOS,
+                1,
+                new BigDecimal("300.0"),
+                "",
+                EstadoAnimal.DISPONIBLE
+        );
+        AnimalController.getInstance().guardarAnimal(animalVaca);
 
+        new loginVista();
 
     }
 

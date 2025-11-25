@@ -26,7 +26,7 @@ public class AnimalController {
         IGenericService<Animal> cliente = new GenericServiceImpl<>(Animal.class, HibernateUtil.getSessionFactory());
         cliente.update(animal);
     }
-    public List<Animal> getCAnimal() {
+    public List<Animal> getAnimal() {
         IGenericService<Animal> clienteIGenericService= new GenericServiceImpl<>(Animal.class, HibernateUtil.getSessionFactory());
         return clienteIGenericService.getAll();
     }

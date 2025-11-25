@@ -3,13 +3,17 @@ package org.getfin.vistas.Ingresos;
 import javax.swing.*;
 import com.toedter.calendar.JDateChooser;
 import org.getfin.controlador.CultivoController;
+import org.getfin.controlador.TransaccionController;
 import org.getfin.modelos.Cultivo;
+import org.getfin.modelos.Transaccion;
 import org.getfin.modelos.enums.CategoriaCultivo;
+import org.getfin.modelos.enums.TipoTransaccion;
+
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -20,6 +24,7 @@ public class cosechaFormulario extends JFrame {
     public cosechaFormulario() {
         initFormulario();
     }
+
 
     private void initFormulario() {
         setTitle("Cosecha - Formulario de Registro");
@@ -156,7 +161,6 @@ public class cosechaFormulario extends JFrame {
         gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 2; gbc.weighty = 0;
         mainPanel.add(panelBotones, gbc);
 
-        // === EVENTOS ===
         botonCancelar.addActionListener(actionEvent -> dispose());
 
         KeyAdapter recalcularListener = new KeyAdapter() {
@@ -169,6 +173,43 @@ public class cosechaFormulario extends JFrame {
         campoIVA.addKeyListener(recalcularListener);
         campoRetencion.addKeyListener(recalcularListener);
 
+        KeyAdapter recalcularSubTotal = new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+
+                String cantStr = campoCantidad.getText().trim();
+                String precioStr = campoPrecio.getText().trim();
+
+                // Si alguno está vacío → limpiar subtotal y terminar
+                if (cantStr.isEmpty() || precioStr.isEmpty()) {
+                    campoSubTotal.setText("");
+                    return;
+                }
+
+                try {
+                    BigDecimal cantidad = new BigDecimal(cantStr);
+                    BigDecimal precio = new BigDecimal(precioStr);
+
+                    if (cantidad.compareTo(BigDecimal.ZERO) <= 0 || precio.compareTo(BigDecimal.ZERO) <= 0) {
+                        campoSubTotal.setText("");
+                        return;
+                    }
+
+                    BigDecimal subtotal = cantidad.multiply(precio);
+                    campoSubTotal.setText(subtotal.toPlainString());
+
+                } catch (Exception ex) {
+                    campoSubTotal.setText("");
+                }
+
+                calcularTotal(campoSubTotal, campoIVA, campoRetencion, campoTotal);
+            }
+        };
+
+        campoCantidad.addKeyListener(recalcularSubTotal);
+        campoPrecio.addKeyListener(recalcularSubTotal);
+
+
         botonGuardar.addActionListener(actionEvent -> {
             Date fecha = campoFecha.getDate();
             CategoriaCultivo categoria = (CategoriaCultivo) campoTipoProducto.getSelectedItem();
@@ -177,9 +218,13 @@ public class cosechaFormulario extends JFrame {
             String cantidadStr = campoCantidad.getText().trim();
             String precioStr = campoPrecio.getText().trim();
             String ivaStr = campoIVA.getText().trim();
+            String descripcin = areaDescripcion.getText().trim();
+            BigDecimal retencion = new BigDecimal(campoRetencion.getText());
+            BigDecimal total = new BigDecimal(campoTotal.getText());
+            String numFactura = campoFactura.getText();
 
             if (fecha == null || categoria == null || cultivoSeleccionado == null ||
-                    cliente.isEmpty() || cantidadStr.isEmpty() || precioStr.isEmpty() || ivaStr.isEmpty()) {
+                    cliente.isEmpty() || cantidadStr.isEmpty() || precioStr.isEmpty() || ivaStr.isEmpty() ) {
                 JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos obligatorios.",
                         "Campos incompletos", JOptionPane.WARNING_MESSAGE);
                 return;
@@ -212,10 +257,26 @@ public class cosechaFormulario extends JFrame {
                         "Stock insuficiente", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            LocalDate fechaLocal = fecha.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
 
-            JOptionPane.showMessageDialog(this,
-                    "✔ Registro válido.\nPuede continuar con el guardado en base de datos.",
-                    "Validación exitosa", JOptionPane.INFORMATION_MESSAGE);
+            BigDecimal precio = new BigDecimal(precioStr);
+            BigDecimal iva = new BigDecimal(ivaStr);
+
+            Transaccion trans = new Transaccion(
+                    TipoTransaccion.INGRESO,
+                    descripcin,
+                    cliente,
+                    cultivoSeleccionado,
+                    numFactura,
+                    total,
+                    retencion,
+                    cantidad,
+                    fechaLocal,
+                    precio,
+                    iva
+            );
+            TransaccionController.getInstance().guardarTransaccion(trans);
+            dispose();
         });
 
         add(mainPanel);
@@ -228,12 +289,22 @@ public class cosechaFormulario extends JFrame {
             BigDecimal iva = new BigDecimal(campoIVA.getText());
             BigDecimal retencion = new BigDecimal(campoRetencion.getText());
 
+            if (subTotal.compareTo(BigDecimal.ZERO) < 0 ||
+                    iva.compareTo(BigDecimal.ZERO) < 0 ||
+                    retencion.compareTo(BigDecimal.ZERO) < 0)
+            {
+                campoTotal.setText("");
+                return;
+            }
+
             BigDecimal ivaCalculado = subTotal.multiply(iva).divide(new BigDecimal(100));
             BigDecimal total = subTotal.subtract(ivaCalculado).subtract(retencion);
 
             campoTotal.setText(total.toString());
+
         } catch (NumberFormatException ex) {
             campoTotal.setText("");
         }
     }
+
 }

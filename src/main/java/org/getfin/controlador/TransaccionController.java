@@ -19,16 +19,16 @@ public class TransaccionController {
         IGenericService<Transaccion> clientes = new GenericServiceImpl<>(Transaccion.class, HibernateUtil.getSessionFactory());
         clientes.save(transaccion);
     }
-    public void eliminarCliente(Usuario cliente){
-        IGenericService<Usuario> clientes = new GenericServiceImpl<>(Usuario.class, HibernateUtil.getSessionFactory());
-        clientes.delete(cliente);
+    public void eliminarTransaccion(Transaccion transaccion){
+        IGenericService<Transaccion> clientes = new GenericServiceImpl<>(Transaccion.class, HibernateUtil.getSessionFactory());
+        clientes.delete(transaccion);
     }
-    public void editarCliente(Usuario cliente){
-        IGenericService<Usuario> clientes = new GenericServiceImpl<>(Usuario.class, HibernateUtil.getSessionFactory());
+    public void editarTransaccion(Transaccion cliente){
+        IGenericService<Transaccion> clientes = new GenericServiceImpl<>(Transaccion.class, HibernateUtil.getSessionFactory());
         clientes.update(cliente);
     }
-    public List<Usuario> getClientes() {
-        IGenericService<Usuario> clienteIGenericService= new GenericServiceImpl<>(Usuario.class, HibernateUtil.getSessionFactory());
+    public List<Transaccion> getTransacciones() {
+        IGenericService<Transaccion> clienteIGenericService= new GenericServiceImpl<>(Transaccion.class, HibernateUtil.getSessionFactory());
         return clienteIGenericService.getAll();
     }
 
