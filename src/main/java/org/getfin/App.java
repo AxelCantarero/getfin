@@ -9,8 +9,6 @@ import org.getfin.modelos.enums.EstadoAnimal;
 import org.getfin.modelos.enums.EstadoCultivo;
 import org.getfin.modelos.enums.TipoAnimal;
 import org.getfin.vistas.Login.loginVista;
-import org.getfin.vistas.contenidoPrincipal.ventanaPrincipal;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -27,7 +25,7 @@ public class App {
                 CategoriaCultivo.GRANOS_BASICOS,       // categoría
                 EstadoCultivo.CRECIMIENTO,             // estado
                 new BigDecimal("1500.00"),             // stock disponible en kg
-                new BigDecimal("8500.00")              // monto inicial invertido
+                new BigDecimal("8500.00")
         );
         CultivoController.getInstance().guardarCultivo(cultivoMaiz);
 
@@ -41,9 +39,7 @@ public class App {
                 EstadoAnimal.DISPONIBLE
         );
         AnimalController.getInstance().guardarAnimal(animalVaca);
-
         new loginVista();
-
     }
 
 }

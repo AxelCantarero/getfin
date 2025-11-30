@@ -2,8 +2,6 @@ package org.getfin.modelos;
 
 import jakarta.persistence.*;
 import org.getfin.modelos.enums.TipoTransaccion;
-import org.getfin.modelos.Cultivo;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -26,6 +24,7 @@ public class Transaccion {
     private BigDecimal retencion;
     private BigDecimal total;
     private String numeroFactura;
+    private String categoria;
 
     @ManyToOne
     @JoinColumn(name = "idProducto")
@@ -83,6 +82,21 @@ public class Transaccion {
         this.tipo = tipo;
         this.descripcion = descripcion;
     }
+    // Constructor especial para ventas de lácteos
+    public Transaccion(String nombreCliente, BigDecimal cantidad, BigDecimal precio,
+                       BigDecimal retencion, LocalDate fecha, String descripcion) {
+        this.nombreCliente = nombreCliente;
+        this.cantidad = cantidad;
+        this.precioUnitario = precio;
+        this.retencion = retencion;
+        this.fecha = fecha;
+        this.descripcion = descripcion;
+        this.tipo = TipoTransaccion.INGRESO; // siempre ingreso
+        this.categoria = "LÁCTEO";           // predeterminado
+        this.iva = BigDecimal.ZERO;          // sin IVA
+        this.total = precio.multiply(cantidad).subtract(retencion); // calcula total básico
+    }
+
 
     public Long getIdTransaccion() {
         return idTransaccion;
@@ -194,5 +208,13 @@ public class Transaccion {
 
     public void setNumeroFactura(String numeroFactura) {
         this.numeroFactura = numeroFactura;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 }

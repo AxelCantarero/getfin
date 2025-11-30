@@ -3,41 +3,39 @@ package org.getfin.vistas.Ingresos;
 import javax.swing.*;
 import java.awt.*;
 
-public class IngresoSeleccionMenu extends JFrame {
+public class IngresoSeleccionMenu extends JDialog {
 
-    public IngresoSeleccionMenu() {
-        setTitle("Seleccionar tipo de ingreso");
-        setSize(400, 200);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    public IngresoSeleccionMenu(JFrame owner, ingresoVista vistaPadre) {
+        super(owner, "Seleccionar tipo de ingreso", true);
 
-        // Panel principal
-        JPanel panel = new JPanel(new GridLayout(2, 1, 20, 20));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
+        setLayout(new GridLayout());
+        setSize(350, 200);
+        setLocationRelativeTo(owner);
 
-        // Botones
-        JButton btnCosecha = new JButton("Registro de Cosecha");
-        JButton btnVentaAnimales = new JButton("Venta de Animales");
+        JButton btnCosecha = new JButton("Registrar Cosecha");
+        JButton btnAnimal = new JButton("Registrar Venta Animal");
+        JButton btnLeche = new JButton("Registrar Venta Leche");
+        btnCosecha.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btnAnimal.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btnLeche.setFont(new Font("Segoe UI", Font.BOLD, 16));
 
-        btnCosecha.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnVentaAnimales.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        add(btnCosecha);
+        add(btnAnimal);
+        add(btnLeche);
 
-        // Acciones
         btnCosecha.addActionListener(e -> {
-            new cosechaFormulario();
-            dispose(); // cierra el menú
-        });
-
-        btnVentaAnimales.addActionListener(e -> {
-            new ventaAnimalFormulario(); // esta clase la crearás igual que cosechaFormulario
+            new cosechaFormulario(owner, vistaPadre).setVisible(true);
             dispose();
         });
 
-        // Agregar botones al panel
-        panel.add(btnCosecha);
-        panel.add(btnVentaAnimales);
+        btnAnimal.addActionListener(e -> {
+            new ventaAnimalFormulario(owner, vistaPadre).setVisible(true);
+            dispose();
+        });
+        btnLeche.addActionListener(e -> {
+            new ventaLecheFormulario(owner, vistaPadre).setVisible(true);
+            dispose();
+        });
 
-        add(panel);
-        setVisible(true);
     }
 }
