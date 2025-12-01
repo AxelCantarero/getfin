@@ -5,6 +5,7 @@ import org.getfin.vistas.Dashboard.dashboardVista;
 import org.getfin.vistas.Ingresos.ingresoVista;
 //import org.getfin.vistas.componentes.menuOpciones;
 import org.getfin.vistas.cultivos.CultivoVista;
+import org.getfin.vistas.egresos.egresoVista;
 import org.getfin.vistas.productos.ProductoVista;
 import org.getfin.vistas.visitas.VisitaVista;
 
@@ -72,8 +73,7 @@ public class ventanaPrincipal extends JFrame {
 
                 case "Ingreso" -> cargarPanel(new ingresoVista());
 
-                case "Egreso" -> JOptionPane.showMessageDialog(this,
-                        "Aún no has creado la vista EgresoVista");
+                case "Egreso" -> cargarPanel(new egresoVista());
 
                 case "Animal" -> JOptionPane.showMessageDialog(this,
                         "Aún no has creado la vista AnimalVista");

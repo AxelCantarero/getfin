@@ -2,9 +2,9 @@ package org.getfin.vistas.egresos;
 
 import org.getfin.controlador.TransaccionController;
 import org.getfin.modelos.Transaccion;
+import org.getfin.modelos.enums.TipoTransaccion;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
@@ -12,186 +12,134 @@ import java.util.List;
 
 public class egresoVista extends JPanel {
 
-    private final DefaultTableModel modelo = new DefaultTableModel(
-            new Object[]{"ID", "Tipo", "Fecha", "Proveedor", "Descripción",
-                    "Cantidad", "Precio U.", "Total", "Factura", "Referencia"}, 0) {
+    private JTable tablaEgresos;
+    private DefaultTableModel modeloTabla;
+    private JButton btnNuevo, btnActualizar, btnEliminar;
 
-        @Override public boolean isCellEditable(int row, int column) { return false; }
-
-        @Override public Class<?> getColumnClass(int columnIndex) {
-            return columnIndex == 0 ? Long.class : super.getColumnClass(columnIndex);
-        }
-    };
-
-    private final JTable tabla = new JTable(modelo);
-
-    private final JButton botonAgregar = crearBoton("Agregar", new Color(40, 167, 69));
-    private final JButton botonEditar = crearBoton("Editar", new Color(33, 150, 243));
-    private final JButton botonEliminar = crearBoton("Eliminar", new Color(244, 67, 54));
-
-    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-
-    public egresoVista() {
-        setLayout(new BorderLayout(10, 10));
+    public egresoVista() {  // ← ya no recibe JFrame
+        setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
-        // ------------------ HEADER ------------------
-        JPanel superiorPanel = new JPanel(new BorderLayout());
-        superiorPanel.setBackground(Color.WHITE);
-        superiorPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        // ============ BOTONES SUPERIORES ============
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelBotones.setBackground(Color.WHITE);
 
-        JLabel label = new JLabel("Gestión de Egresos");
-        label.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        btnNuevo = crearBoton("Nuevo Egreso", new Color(46, 204, 113));
+        btnActualizar = crearBoton("Actualizar", new Color(52, 152, 219));
+        btnEliminar = crearBoton("Eliminar", new Color(231, 76, 60));
 
-        superiorPanel.add(label, BorderLayout.WEST);
-        superiorPanel.add(botonAgregar, BorderLayout.EAST);
-        add(superiorPanel, BorderLayout.NORTH);
+        panelBotones.add(btnNuevo);
+        panelBotones.add(btnActualizar);
+        panelBotones.add(btnEliminar);
 
-        // ------------------ TABLA ------------------
-        configurarTabla();
-        add(new JScrollPane(tabla), BorderLayout.CENTER);
+        add(panelBotones, BorderLayout.NORTH);
 
-        // ------------------ BOTONES ------------------
-        JPanel botonesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
-        botonesPanel.setBackground(Color.WHITE);
-        botonesPanel.add(botonEditar);
-        botonesPanel.add(botonEliminar);
+        // ============ TABLA ============
+        tablaEgresos = new JTable();
+        modeloTabla = new DefaultTableModel(
+                new String[]{"ID", "Fecha", "Tipo", "Categoría", "Detalle", "Cantidad", "Monto"},
+                0
+        );
+        tablaEgresos.setModel(modeloTabla);
+        tablaEgresos.setRowHeight(30);
 
-        add(botonesPanel, BorderLayout.SOUTH);
+        add(new JScrollPane(tablaEgresos), BorderLayout.CENTER);
 
-        // ------------------ EVENTOS ------------------
-        asignarEventos();
+        // ============ EVENTOS ============
 
-        // ------------------ CARGAR DATOS ------------------
+        btnNuevo.addActionListener(e -> {
+            JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
+            new EgresoSeleccionMenu(parent, this).setVisible(true);
+        });
+
+        btnActualizar.addActionListener(e -> recargarTabla());
+
+        btnEliminar.addActionListener(e -> eliminar());
+
         recargarTabla();
     }
 
-    private void configurarTabla() {
-        tabla.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
-        tabla.getTableHeader().setBackground(new Color(230, 230, 230));
-        tabla.setRowHeight(25);
-        tabla.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    // ====================================================
+    //  BOTONES CON ESTILO
+    // ====================================================
+    private JButton crearBoton(String texto, Color color) {
+        JButton btn = new JButton(texto);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btn.setForeground(Color.WHITE);
+        btn.setBackground(color);
+        btn.setFocusPainted(false);
+        btn.setPreferredSize(new Dimension(160, 40));
+        return btn;
     }
 
-    // --------------------------------------------------------------------
-    // EVENTOS
-    // --------------------------------------------------------------------
-    private void asignarEventos() {
-
-        // AGREGAR
-        botonAgregar.addActionListener(e -> {
-            JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
-            new EgresoSeleccionMenu(parent, this).setVisible(true);  // Creamos luego
-        });
-
-        // EDITAR
-        botonEditar.addActionListener(e -> {
-            int fila = tabla.getSelectedRow();
-            if (fila == -1) {
-                JOptionPane.showMessageDialog(this, "Seleccione un registro para editar.");
-                return;
-            }
-
-            Long id = (Long) modelo.getValueAt(fila, 0);
-            Transaccion t = obtenerTransaccionPorId(id);
-            if (t == null) return;
-
-            JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
-
-            // Aquí se integrarán los formularios según tipo:
-            switch (t.getTipo()) {
-                case "Herramienta":
-                    // new compraHerramientaFormulario(parent, this).cargar(t);
-                    break;
-
-                case "GastoCultivo":
-                    // new gastoCultivoFormulario(parent, this).cargar(t);
-                    break;
-
-                case "GastoAnimal":
-                    // new gastoAnimalFormulario(parent, this).cargar(t);
-                    break;
-
-                default:
-                    // new otrosEgresosFormulario(parent, this).cargar(t);
-                    break;
-            }
-        });
-
-        // ELIMINAR
-        botonEliminar.addActionListener(e -> {
-            int fila = tabla.getSelectedRow();
-            if (fila == -1) {
-                JOptionPane.showMessageDialog(this, "Seleccione un registro para eliminar.");
-                return;
-            }
-
-            Long id = (Long) modelo.getValueAt(fila, 0);
-            Transaccion t = obtenerTransaccionPorId(id);
-            if (t == null) return;
-
-            int ok = JOptionPane.showConfirmDialog(this,
-                    "¿Seguro que desea eliminar el egreso " + id + "?",
-                    "Confirmar", JOptionPane.YES_NO_OPTION);
-
-            if (ok == JOptionPane.YES_OPTION) {
-                TransaccionController.getInstance().eliminarTransaccion(t);
-                recargarTabla();
-            }
-        });
-    }
-
-    // --------------------------------------------------------------------
-    // CARGAR DATOS A LA TABLA
-    // --------------------------------------------------------------------
+    // ====================================================
+    //  RECARGAR TABLA
+    // ====================================================
     public void recargarTabla() {
-        modelo.setRowCount(0);
+        modeloTabla.setRowCount(0);
 
-        List<Transaccion> lista = TransaccionController.getInstance().getTransacciones();
+        List<Transaccion> lista = TransaccionController.getInstance()
+                .getTransacciones()
+                .stream()
+                .filter(t -> t.getTipo() == TipoTransaccion.EGRESO)
+                .toList();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         for (Transaccion t : lista) {
-            if (!"EGRESO".equalsIgnoreCase(t.getTipoGeneral())) continue;
-
-            String referencia = "";
-            if (t.getHerramienta() != null) referencia = t.getHerramienta().getNombre();
-            if (t.getCultivo() != null) referencia = t.getCultivo().getNombreCultivo();
-            if (t.getAnimal() != null) referencia = t.getAnimal().getNombre();
-
-            modelo.addRow(new Object[]{
+            modeloTabla.addRow(new Object[]{
                     t.getIdTransaccion(),
+                    t.getFecha().format(formatter),
                     t.getTipo(),
-                    t.getFecha() != null ? FMT.format(t.getFecha()) : "N/A",
-                    t.getNombreCliente(),  // proveedor
+                    t.getCategoria() != null ? t.getCategoria() : "-",
                     t.getDescripcion(),
                     t.getCantidad(),
-                    t.getPrecioUnitario(),
-                    t.getTotal(),
-                    t.getNumeroFactura(),
-                    referencia
+                    t.getTotal()
             });
         }
     }
 
-    private Transaccion obtenerTransaccionPorId(Long id) {
-        return TransaccionController.getInstance().getTransacciones()
+    // ====================================================
+    //  ELIMINAR EGRESO (CORREGIDO)
+    // ====================================================
+    private void eliminar() {
+        int fila = tablaEgresos.getSelectedRow();
+
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione un egreso para eliminar.");
+            return;
+        }
+
+        Long id = Long.parseLong(modeloTabla.getValueAt(fila, 0).toString());
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "¿Eliminar este egreso?",
+                "Confirmación",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        // OBTENER OBJETO COMPLETO
+        Transaccion transaccionAEliminar = TransaccionController.getInstance()
+                .getTransacciones()
                 .stream()
-                .filter(tr -> tr.getIdTransaccion().equals(id))
+                .filter(t -> t.getIdTransaccion().equals(id))
                 .findFirst()
                 .orElse(null);
-    }
 
-    // --------------------------------------------------------------------
-    // UI Utilidades
-    // --------------------------------------------------------------------
-    private static JButton crearBoton(String texto, Color bg) {
-        JButton b = new JButton(texto);
-        b.setBackground(bg);
-        b.setForeground(Color.WHITE);
-        b.setFocusPainted(false);
-        b.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        b.setPreferredSize(new Dimension(130, 35));
-        b.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        return b;
+        if (transaccionAEliminar == null) {
+            JOptionPane.showMessageDialog(this, "No se encontró la transacción.");
+            return;
+        }
+
+        // ELIMINAR
+        TransaccionController.getInstance().eliminarTransaccion(transaccionAEliminar);
+
+        recargarTabla();
+        JOptionPane.showMessageDialog(this, "Egreso eliminado correctamente.");
     }
 }

@@ -41,10 +41,9 @@ public class Transaccion {
     public Transaccion() {
     }
 
-    public Transaccion(TipoTransaccion tipo, String descripcion, String nombreCliente, LocalDate fecha, BigDecimal cantidad, BigDecimal precioUnitario, BigDecimal iva, BigDecimal retencion, BigDecimal total, String numeroFactura, Producto producto) {
+    public Transaccion(TipoTransaccion tipo, String descripcion, LocalDate fecha, BigDecimal cantidad, BigDecimal precioUnitario, BigDecimal iva, BigDecimal retencion, BigDecimal total, String numeroFactura, Producto producto) {
         this.tipo = tipo;
         this.descripcion = descripcion;
-        this.nombreCliente = nombreCliente;
         this.fecha = fecha;
         this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;

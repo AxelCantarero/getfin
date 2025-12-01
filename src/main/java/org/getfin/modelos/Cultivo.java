@@ -42,6 +42,15 @@ public class Cultivo {
         this.montoInicial = montoInicial;
     }
 
+    public Cultivo(String nombreCultivo, LocalDate fechaCosecha, CategoriaCultivo categoria, EstadoCultivo estado, BigDecimal stock, BigDecimal montoInicial) {
+        this.nombreCultivo = nombreCultivo;
+        this.fechaCosecha = fechaCosecha;
+        this.categoria = categoria;
+        this.estado = estado;
+        this.stock = stock;
+        this.montoInicial = montoInicial;
+    }
+
     public Long getIdCultivo() {
         return idCultivo;
     }
