@@ -144,4 +144,19 @@ public class EgresoCultivoFormulario extends JDialog {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
     }
+    public void cargarTransaccion(Transaccion t) {
+        if (t == null || t.getCultivo() == null) return;
+
+        Cultivo c = t.getCultivo();
+
+        // Datos del cultivo
+        txtNombre.setText(c.getNombreCultivo());
+        comboCategoria.setSelectedItem(c.getCategoria());
+        // Datos de la transacción
+        txtMonto.setText(t.getTotal().toPlainString());
+        txtIva.setText(t.getIva().toPlainString());
+        txtRetencion.setText(t.getRetencion().toPlainString());
+        txtTotal.setText(t.getTotal().toPlainString());
+    }
+
 }

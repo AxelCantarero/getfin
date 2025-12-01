@@ -20,9 +20,9 @@ public class EgresoProductoFormulario extends JDialog {
     private JTextField txtNombre, txtDescripcion, txtUnidad, txtStock, txtMonto, txtCaducidad;
     private JTextField txtIVA, txtRetencion, txtSubtotal, txtTotal;
     private JComboBox<CategoriaProducto> comboCategoria;
-    private JButton btnGuardar;
 
     private final egresoVista vista;
+    private Transaccion transaccionActual = null; // <- Para edición
 
     public EgresoProductoFormulario(JFrame parent, egresoVista vista) {
         super(parent, "Compra de Producto", true);
@@ -37,109 +37,144 @@ public class EgresoProductoFormulario extends JDialog {
         txtUnidad = new JTextField();
         txtStock = new JTextField();
         txtMonto = new JTextField();
-        txtCaducidad = new JTextField("2025-01-01");
+        txtCaducidad = new JTextField(LocalDate.now().toString());
 
-        txtIVA = new JTextField();
-        txtIVA.setEditable(false);
-
-        txtRetencion = new JTextField();
-        txtRetencion.setEditable(false);
-
+        txtIVA = new JTextField("0.00");
+        txtRetencion = new JTextField("0.00");
         txtSubtotal = new JTextField();
-        txtSubtotal.setEditable(false);
-
         txtTotal = new JTextField();
+
+        txtSubtotal.setEditable(false);
         txtTotal.setEditable(false);
 
         comboCategoria = new JComboBox<>(CategoriaProducto.values());
-        btnGuardar = new JButton("Guardar");
+        JButton btnGuardar = new JButton("Guardar");
 
+        // UI
         add(new JLabel("Nombre:")); add(txtNombre);
         add(new JLabel("Descripción:")); add(txtDescripcion);
         add(new JLabel("Unidad:")); add(txtUnidad);
         add(new JLabel("Categoría:")); add(comboCategoria);
-        add(new JLabel("Fecha Caducidad (YYYY-MM-DD):")); add(txtCaducidad);
-        add(new JLabel("Stock Inicial:")); add(txtStock);
+        add(new JLabel("Fecha Caducidad:")); add(txtCaducidad);
+        add(new JLabel("Cantidad (Stock):")); add(txtStock);
         add(new JLabel("Monto Pagado:")); add(txtMonto);
 
-        add(new JLabel("IVA (15%):")); add(txtIVA);
-        add(new JLabel("Retención (2%):")); add(txtRetencion);
+        add(new JLabel("IVA:")); add(txtIVA);
+        add(new JLabel("Retención:")); add(txtRetencion);
         add(new JLabel("Subtotal:")); add(txtSubtotal);
         add(new JLabel("Total:")); add(txtTotal);
 
         add(btnGuardar);
 
-        // Listener integrado SIN clase externa
-        txtMonto.getDocument().addDocumentListener(new DocumentListener() {
-            @Override public void insertUpdate(DocumentEvent e) { recalcularTotales(); }
-            @Override public void removeUpdate(DocumentEvent e) { recalcularTotales(); }
-            @Override public void changedUpdate(DocumentEvent e) { recalcularTotales(); }
-        });
+        DocumentListener listener = new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { recalcular(); }
+            public void removeUpdate(DocumentEvent e) { recalcular(); }
+            public void changedUpdate(DocumentEvent e) { recalcular(); }
+        };
+
+        txtMonto.getDocument().addDocumentListener(listener);
+        txtIVA.getDocument().addDocumentListener(listener);
+        txtRetencion.getDocument().addDocumentListener(listener);
 
         btnGuardar.addActionListener(e -> guardar());
     }
 
-    private void recalcularTotales() {
+    private void recalcular() {
         try {
-            double monto = Double.parseDouble(txtMonto.getText());
+            BigDecimal monto = new BigDecimal(txtMonto.getText());
+            BigDecimal iva = new BigDecimal(txtIVA.getText());
+            BigDecimal ret = new BigDecimal(txtRetencion.getText());
 
-            double iva = monto * 0.15;
-            double ret = monto * 0.02;
-            double subtotal = monto + iva + ret;
+            BigDecimal subtotal = monto.add(iva).add(ret);
 
-            txtIVA.setText(String.format("%.2f", iva));
-            txtRetencion.setText(String.format("%.2f", ret));
-            txtSubtotal.setText(String.format("%.2f", subtotal));
-            txtTotal.setText(String.format("%.2f", subtotal));
+            txtSubtotal.setText(subtotal.toString());
+            txtTotal.setText(subtotal.toString());
 
-        } catch (Exception ex) {
-            txtIVA.setText("");
-            txtRetencion.setText("");
+        } catch (Exception e) {
             txtSubtotal.setText("");
             txtTotal.setText("");
         }
     }
 
+    public void cargarTransaccion(Transaccion t){
+        this.transaccionActual = t;
+
+        Producto p = t.getProducto();
+
+        txtNombre.setText(p.getNombreProducto());
+        txtDescripcion.setText(p.getDescripcion());
+        txtUnidad.setText(p.getUnidadMedida());
+        comboCategoria.setSelectedItem(p.getCategoria());
+        txtCaducidad.setText(p.getFechaCaducidad().toString());
+        txtStock.setText(t.getCantidad().toString());
+        txtIVA.setText(t.getIva().toString());
+        txtRetencion.setText(t.getRetencion().toString());
+        txtTotal.setText(t.getTotal().toString());
+    }
+
     private void guardar() {
         try {
-            String stockText = txtStock.getText().replace(",", ".");
-            String montoText = txtMonto.getText().replace(",", ".");
+            BigDecimal stock = new BigDecimal(txtStock.getText());
+            BigDecimal monto = new BigDecimal(txtMonto.getText());
+            BigDecimal iva = new BigDecimal(txtIVA.getText());
+            BigDecimal retencion = new BigDecimal(txtRetencion.getText());
+            BigDecimal total = new BigDecimal(txtTotal.getText());
+            BigDecimal subtotal = new BigDecimal(txtSubtotal.getText());
 
-            BigDecimal stock = new BigDecimal(stockText);
-            BigDecimal monto = new BigDecimal(montoText);
-            // Crear producto
-            Producto p = new Producto(
-                    txtNombre.getText(),
-                    txtDescripcion.getText(),
-                    txtUnidad.getText(),
-                    (CategoriaProducto) comboCategoria.getSelectedItem(),
-                    LocalDate.parse(txtCaducidad.getText()),
-                    new BigDecimal(txtStock.getText()),
-                    new BigDecimal(txtMonto.getText()),
-                    EstadoProducto.DISPONIBLE
-            );
+            if(transaccionActual == null){
+                // Crear producto nuevo
+                Producto p = new Producto(
+                        txtNombre.getText(),
+                        txtDescripcion.getText(),
+                        txtUnidad.getText(),
+                        (CategoriaProducto) comboCategoria.getSelectedItem(),
+                        LocalDate.parse(txtCaducidad.getText()),
+                        stock,
+                        monto,
+                        EstadoProducto.DISPONIBLE
+                );
 
-            ProductoController.getInstance().guardarProducto(p);
-            BigDecimal precioUnitario = stock.compareTo(BigDecimal.ZERO) > 0 ? monto.divide(stock, 2, BigDecimal.ROUND_HALF_UP) : monto;
+                ProductoController.getInstance().guardarProducto(p);
 
-            // Crear transacción (con tu constructor exacto)
-            Transaccion t = new Transaccion(
-                    TipoTransaccion.EGRESO,
-                    "Compra de " + txtNombre.getText(),
-                    LocalDate.now(),
-                    stock,       // cantidad
-                    monto,       // precio unitario
-                    new BigDecimal(txtIVA.getText().replace(",", ".")),
-                    new BigDecimal(txtRetencion.getText().replace(",", ".")),   // retención
-                    new BigDecimal(txtTotal.getText().replace(",", ".")),       // total
-                    "",                                        // numeroFactura
-                    p                                          // producto
-            );
+                Transaccion t = new Transaccion(
+                        TipoTransaccion.EGRESO,
+                        "Compra de " + txtNombre.getText(),
+                        LocalDate.now(),
+                        stock,
+                        monto,
+                        iva,
+                        retencion,
+                        total,
+                        "",
+                        p
+                );
 
-            TransaccionController.getInstance().guardarTransaccion(t);
+                TransaccionController.getInstance().guardarTransaccion(t);
+                JOptionPane.showMessageDialog(this, "Producto agregado correctamente.");
+            } else {
+                // Actualizar producto existente
+                Producto p = transaccionActual.getProducto();
+                p.setNombreProducto(txtNombre.getText());
+                p.setDescripcion(txtDescripcion.getText());
+                p.setUnidadMedida(txtUnidad.getText());
+                p.setCategoria((CategoriaProducto) comboCategoria.getSelectedItem());
+                p.setFechaCaducidad(LocalDate.parse(txtCaducidad.getText()));
+                p.setStock(stock);
+
+                ProductoController.getInstance().editarProducto(p);
+
+                transaccionActual.setCantidad(stock);
+
+                transaccionActual.setIva(iva);
+                transaccionActual.setRetencion(retencion);
+
+                transaccionActual.setTotal(total);
+
+                TransaccionController.getInstance().editarTransaccion(transaccionActual);
+                JOptionPane.showMessageDialog(this, "Producto actualizado correctamente.");
+            }
 
             vista.recargarTabla();
-            JOptionPane.showMessageDialog(this, "Producto comprado correctamente.");
             dispose();
 
         } catch (Exception ex) {

@@ -97,51 +97,86 @@ public class EgresoAnimalFormulario extends JDialog {
 
     private void guardar() {
 
-        try {
+        if (animalActual != null) {
+            try {
+                if (transaccionActual != null) {
+                    BigDecimal precioUnit = new BigDecimal(txtPrecioUnitario.getText());
+                    BigDecimal cantidad = new BigDecimal(txtCantidad.getText());
+                    BigDecimal iva = new BigDecimal(txtIVA.getText());
+                    BigDecimal ret = new BigDecimal(txtRetencion.getText());
+                    BigDecimal total = new BigDecimal(txtTotal.getText());
 
-            // 1️⃣ Crear ANIMAL
-            Animal a = new Animal(
-                    txtNombre.getText(),
-                    txtIdentificador.getText(),
-                    (TipoAnimal) comboTipo.getSelectedItem(),
-                    Integer.parseInt(txtCantidad.getText()),
-                    new BigDecimal(txtPeso.getText()),
-                    "Compra de animal",
-                    (EstadoAnimal) comboEstado.getSelectedItem()
-            );
+                    transaccionActual.setCantidad(cantidad);
+                    transaccionActual.setPrecioUnitario(precioUnit);
+                    transaccionActual.setIva(iva);
+                    transaccionActual.setRetencion(ret);
+                    transaccionActual.setTotal(total);
+                    TransaccionController.getInstance().editarTransaccion(transaccionActual);
+                }
 
-            AnimalController.getInstance().guardarAnimal(a);
+                // actualizar el animal existente
+                animalActual.setNombre(txtNombre.getText());
+                animalActual.setIdentificador(txtIdentificador.getText());
+                animalActual.setTipo((TipoAnimal) comboTipo.getSelectedItem());
+                animalActual.setEstado((EstadoAnimal) comboEstado.getSelectedItem());
+                animalActual.setCantidad(Integer.parseInt(txtCantidad.getText()));
+                animalActual.setPesoPromedio(new BigDecimal(txtPeso.getText()));
 
-            // 2️⃣ Valores cálculo
-            BigDecimal precioUnit = new BigDecimal(txtPrecioUnitario.getText());
-            BigDecimal cantidad = new BigDecimal(txtCantidad.getText());
-            BigDecimal iva = new BigDecimal(txtIVA.getText());
-            BigDecimal ret = new BigDecimal(txtRetencion.getText());
-            BigDecimal total = new BigDecimal(txtTotal.getText());
+                AnimalController.getInstance().editarAnimal(animalActual);
+                vista.recargarTabla();
+                JOptionPane.showMessageDialog(this, "Animal actualizado correctamente.");
+                dispose();
 
-            // 3️⃣ Crear TRANSACCIÓN usando TU CONSTRUCTOR
-            Transaccion t = new Transaccion(
-                    a,
-                    "",                       // número factura
-                    total,
-                    ret,
-                    precioUnit,
-                    iva,
-                    cantidad,
-                    LocalDate.now(),
-                    "",                       // nombre cliente
-                    TipoTransaccion.EGRESO,
-                    "Compra de animal"
-            );
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error al actualizar: " + ex.getMessage());
+            }
+        } else {
+            try {
 
-            TransaccionController.getInstance().guardarTransaccion(t);
+                // 1️⃣ Crear ANIMAL
+                Animal a = new Animal(
+                        txtNombre.getText(),
+                        txtIdentificador.getText(),
+                        (TipoAnimal) comboTipo.getSelectedItem(),
+                        Integer.parseInt(txtCantidad.getText()),
+                        new BigDecimal(txtPeso.getText()),
+                        "Compra de animal",
+                        (EstadoAnimal) comboEstado.getSelectedItem()
+                );
 
-            vista.recargarTabla();
-            JOptionPane.showMessageDialog(this, "Animal registrado y transacción creada.");
-            dispose();
+                AnimalController.getInstance().guardarAnimal(a);
 
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+                // 2️⃣ Valores cálculo
+                BigDecimal precioUnit = new BigDecimal(txtPrecioUnitario.getText());
+                BigDecimal cantidad = new BigDecimal(txtCantidad.getText());
+                BigDecimal iva = new BigDecimal(txtIVA.getText());
+                BigDecimal ret = new BigDecimal(txtRetencion.getText());
+                BigDecimal total = new BigDecimal(txtTotal.getText());
+
+                // 3️⃣ Crear TRANSACCIÓN usando TU CONSTRUCTOR
+                Transaccion t = new Transaccion(
+                        a,
+                        "",                       // número factura
+                        total,
+                        ret,
+                        precioUnit,
+                        iva,
+                        cantidad,
+                        LocalDate.now(),
+                        "",                       // nombre cliente
+                        TipoTransaccion.EGRESO,
+                        "Compra de animal"
+                );
+
+                TransaccionController.getInstance().guardarTransaccion(t);
+
+                vista.recargarTabla();
+                JOptionPane.showMessageDialog(this, "Animal registrado y transacción creada.");
+                dispose();
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            }
         }
     }
 
@@ -157,4 +192,28 @@ public class EgresoAnimalFormulario extends JDialog {
         @Override public void removeUpdate(DocumentEvent e) { onChange.run(); }
         @Override public void changedUpdate(DocumentEvent e) { onChange.run(); }
     }
+    private Animal animalActual = null;
+    private Transaccion transaccionActual = null;
+    public void cargarTransaccion(Transaccion t) {
+        if (t == null || t.getAnimal() == null) return;
+
+        animalActual = t.getAnimal();
+        transaccionActual = t;  // guardamos la transacción
+
+        // rellenar campos del animal
+        txtNombre.setText(animalActual.getNombre());
+        txtIdentificador.setText(animalActual.getIdentificador());
+        comboTipo.setSelectedItem(animalActual.getTipo());
+        comboEstado.setSelectedItem(animalActual.getEstado());
+        txtCantidad.setText(String.valueOf(animalActual.getCantidad()));
+        txtPeso.setText(animalActual.getPesoPromedio().toPlainString());
+
+        // rellenar campos de la transacción
+        txtPrecioUnitario.setText(t.getTotal().toPlainString());
+        txtIVA.setText(t.getIva().toPlainString());
+        txtRetencion.setText(t.getRetencion().toPlainString());
+        txtTotal.setText(t.getTotal().toPlainString());
+    }
+
+
 }

@@ -14,9 +14,9 @@ public class egresoVista extends JPanel {
 
     private JTable tablaEgresos;
     private DefaultTableModel modeloTabla;
-    private JButton btnNuevo, btnActualizar, btnEliminar;
+    private JButton btnNuevo, btnActualizar, btnEliminar, btnEditar;
 
-    public egresoVista() {  // ← ya no recibe JFrame
+    public egresoVista() {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
@@ -25,11 +25,11 @@ public class egresoVista extends JPanel {
         panelBotones.setBackground(Color.WHITE);
 
         btnNuevo = crearBoton("Nuevo Egreso", new Color(46, 204, 113));
-        btnActualizar = crearBoton("Actualizar", new Color(52, 152, 219));
+        btnEditar = crearBoton("Editar", new Color(241, 196, 15));
         btnEliminar = crearBoton("Eliminar", new Color(231, 76, 60));
 
         panelBotones.add(btnNuevo);
-        panelBotones.add(btnActualizar);
+        panelBotones.add(btnEditar);
         panelBotones.add(btnEliminar);
 
         add(panelBotones, BorderLayout.NORTH);
@@ -47,20 +47,23 @@ public class egresoVista extends JPanel {
 
         // ============ EVENTOS ============
 
+        // NUEVO
         btnNuevo.addActionListener(e -> {
             JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
             new EgresoSeleccionMenu(parent, this).setVisible(true);
         });
 
-        btnActualizar.addActionListener(e -> recargarTabla());
+        // EDITAR (AQUÍ ES DONDE SE AGREGA LA LÓGICA QUE PEDISTE)
+        btnEditar.addActionListener(e -> editar());
 
+
+        // ELIMINAR
         btnEliminar.addActionListener(e -> eliminar());
 
+        // CARGAR
         recargarTabla();
     }
 
-    // ====================================================
-    //  BOTONES CON ESTILO
     // ====================================================
     private JButton crearBoton(String texto, Color color) {
         JButton btn = new JButton(texto);
@@ -72,8 +75,6 @@ public class egresoVista extends JPanel {
         return btn;
     }
 
-    // ====================================================
-    //  RECARGAR TABLA
     // ====================================================
     public void recargarTabla() {
         modeloTabla.setRowCount(0);
@@ -100,7 +101,59 @@ public class egresoVista extends JPanel {
     }
 
     // ====================================================
-    //  ELIMINAR EGRESO (CORREGIDO)
+    //  EDITAR EGRESO (NUEVO)
+    // ====================================================
+    private void editar() {
+        int fila = tablaEgresos.getSelectedRow();
+
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione un egreso para editar.");
+            return;
+        }
+
+        Long id = Long.parseLong(modeloTabla.getValueAt(fila, 0).toString());
+
+        Transaccion t = TransaccionController.getInstance()
+                .getTransacciones()
+                .stream()
+                .filter(x -> x.getIdTransaccion().equals(id))
+                .findFirst()
+                .orElse(null);
+
+        if (t == null) {
+            JOptionPane.showMessageDialog(this, "No se encontró la transacción.");
+            return;
+        }
+
+        JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
+
+        // ============================
+        // ABRIR FORMULARIO CORRECTO
+        // ============================
+
+        if(t.getCultivo() != null){
+            EgresoCultivoFormulario form = new EgresoCultivoFormulario(parent, this);
+            form.cargarTransaccion(t); // <--- cargar datos
+            form.setVisible(true);
+        }
+        else if (t.getAnimal() != null){
+            EgresoAnimalFormulario form = new EgresoAnimalFormulario(parent, this);
+            form.cargarTransaccion(t); // <--- cargar datos
+            form.setVisible(true);
+        }
+        else if (t.getProducto() != null){
+            EgresoProductoFormulario form = new EgresoProductoFormulario(parent, this);
+            form.cargarTransaccion(t); // <--- cargar datos
+            form.setVisible(true);
+        }
+        else{
+            JOptionPane.showMessageDialog(this, "Categoría desconocida: " + t.getCategoria());
+        }
+
+    }
+
+    // ====================================================
+    //  ELIMINAR (YA FUNCIONA)
     // ====================================================
     private void eliminar() {
         int fila = tablaEgresos.getSelectedRow();
@@ -119,11 +172,8 @@ public class egresoVista extends JPanel {
                 JOptionPane.YES_NO_OPTION
         );
 
-        if (confirm != JOptionPane.YES_OPTION) {
-            return;
-        }
+        if (confirm != JOptionPane.YES_OPTION) return;
 
-        // OBTENER OBJETO COMPLETO
         Transaccion transaccionAEliminar = TransaccionController.getInstance()
                 .getTransacciones()
                 .stream()
@@ -136,7 +186,6 @@ public class egresoVista extends JPanel {
             return;
         }
 
-        // ELIMINAR
         TransaccionController.getInstance().eliminarTransaccion(transaccionAEliminar);
 
         recargarTabla();
