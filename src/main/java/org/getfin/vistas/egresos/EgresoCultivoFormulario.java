@@ -153,6 +153,7 @@ public class EgresoCultivoFormulario extends JDialog {
         txtNombre.setText(c.getNombreCultivo());
         comboCategoria.setSelectedItem(c.getCategoria());
         // Datos de la transacción
+        txtStock.setText(t.getCantidad().toString());
         txtMonto.setText(t.getTotal().toPlainString());
         txtIva.setText(t.getIva().toPlainString());
         txtRetencion.setText(t.getRetencion().toPlainString());

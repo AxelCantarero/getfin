@@ -8,16 +8,26 @@ public class IngresoSeleccionMenu extends JDialog {
     public IngresoSeleccionMenu(JFrame owner, ingresoVista vistaPadre) {
         super(owner, "Seleccionar tipo de ingreso", true);
 
-        setLayout(new GridLayout());
-        setSize(350, 200);
+        setSize(420, 260);
         setLocationRelativeTo(owner);
+        setLayout(new GridLayout(4, 1, 10, 10));
 
         JButton btnCosecha = new JButton("Registrar Cosecha");
         JButton btnAnimal = new JButton("Registrar Venta Animal");
         JButton btnLeche = new JButton("Registrar Venta Leche");
-        btnCosecha.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        btnAnimal.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        btnLeche.setFont(new Font("Segoe UI", Font.BOLD, 16));
+
+        btnCosecha.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        btnAnimal.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        btnLeche.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        btnCosecha.setBackground(new Color(52, 152, 219));
+        btnAnimal.setBackground(new Color(52, 152, 219));
+        btnLeche.setBackground(new Color(52, 152, 219));
+        btnCosecha.setForeground(Color.WHITE);
+        btnAnimal.setForeground(Color.WHITE);
+        btnLeche.setForeground(Color.WHITE);
+        btnCosecha.setFocusPainted(false);
+        btnAnimal.setFocusPainted(false);
+        btnLeche.setFocusPainted(false);
 
         add(btnCosecha);
         add(btnAnimal);

@@ -1,7 +1,6 @@
 package org.getfin.controlador;
 
 import org.getfin.modelos.Animal;
-import org.getfin.modelos.Usuario;
 import org.getfin.servicios.GenericServiceImpl;
 import org.getfin.servicios.IGenericService;
 import org.getfin.util.HibernateUtil;
@@ -36,6 +35,9 @@ public class AnimalController {
             instance = new AnimalController();
         }
         return instance;
+    }
+    public int totalAnimal() {
+        return getInstance().getAnimal().size();
     }
 
 

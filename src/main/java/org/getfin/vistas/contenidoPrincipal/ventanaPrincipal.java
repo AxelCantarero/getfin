@@ -56,8 +56,10 @@ public class ventanaPrincipal extends JFrame {
         barraopciones.setPreferredSize(new Dimension(60, 100));
         add(barraopciones, BorderLayout.WEST);
 
+
         /** Panel central */
         contenido.setBackground(Color.WHITE);
+        contenido.add(new dashboardVista(), BorderLayout.CENTER);
         add(contenido, BorderLayout.CENTER);
 
         setVisible(true);

@@ -24,7 +24,6 @@ public class Animal {
     private Integer cantidad;
     private BigDecimal pesoPromedio;
     private String descripcion;
-
     @Enumerated(EnumType.STRING)
     private EstadoAnimal estado = EstadoAnimal.DISPONIBLE;
 

@@ -1,10 +1,13 @@
 package org.getfin.vistas.Login;
+import org.getfin.controlador.UsuarioController;
+import org.getfin.modelos.Usuario;
 import org.getfin.vistas.contenidoPrincipal.ventanaPrincipal;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class loginVista extends JFrame  {
 
@@ -92,11 +95,14 @@ public class loginVista extends JFrame  {
         botonLogin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(textUsuario.getText().equals("axel") && textContrasena.getText().equals("123")){
-                    new ventanaPrincipal();
-                    dispose();
-
+                List<Usuario> usuarios = UsuarioController.getInstance().getClientes();
+                for (Usuario usuario : usuarios) {
+                    if(textUsuario.getText().equals(usuario.getNombreUsuario()) && textContrasena.getText().equals(usuario.getContrasena())){
+                        new ventanaPrincipal();
+                        dispose();
+                    }
                 }
+
             }
         });
         botonCancelar.addActionListener(e->dispose());

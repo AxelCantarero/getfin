@@ -107,6 +107,7 @@ public class EgresoProductoFormulario extends JDialog {
         comboCategoria.setSelectedItem(p.getCategoria());
         txtCaducidad.setText(p.getFechaCaducidad().toString());
         txtStock.setText(t.getCantidad().toString());
+        txtMonto.setText(t.getTotal().toString());
         txtIVA.setText(t.getIva().toString());
         txtRetencion.setText(t.getRetencion().toString());
         txtTotal.setText(t.getTotal().toString());

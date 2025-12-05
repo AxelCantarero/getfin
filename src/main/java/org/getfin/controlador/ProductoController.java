@@ -1,6 +1,5 @@
 package org.getfin.controlador;
 
-import org.getfin.modelos.Cultivo;
 import org.getfin.modelos.Producto;
 import org.getfin.servicios.GenericServiceImpl;
 import org.getfin.servicios.IGenericService;
@@ -38,4 +37,9 @@ public class ProductoController {
         }
         return instance;
     }
+
+    public int totalPrododucto  (){
+        return getInstance().getProducto().size();
+    }
+
 }

@@ -38,5 +38,8 @@ public class CultivoController {
         }
         return instance;
     }
+    public int totalCultivo (){
+        return getInstance().getCultivo().size();
+    }
 
 }

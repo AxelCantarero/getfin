@@ -6,6 +6,7 @@ import org.getfin.servicios.GenericServiceImpl;
 import org.getfin.servicios.IGenericService;
 import org.getfin.util.HibernateUtil;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class VisitaController {
@@ -30,6 +31,15 @@ public class VisitaController {
     public List<Visita> getVisita() {
         IGenericService<Visita> clienteIGenericService= new GenericServiceImpl<>(Visita.class, HibernateUtil.getSessionFactory());
         return clienteIGenericService.getAll();
+    }
+    public int totalVisitasMes(int mes, int anio) {
+        return getInstance()
+                .getVisita()
+                .stream()
+                .filter(visita -> visita.getFecha().getMonthValue() == mes
+                        && visita.getFecha().getYear() == anio)
+                .mapToInt(visita -> visita.getTotal() != null ? visita.getTotal() : 0)
+                .sum();
     }
 
     public static VisitaController getInstance() {

@@ -5,6 +5,7 @@ import org.getfin.modelos.Transaccion;
 import org.getfin.modelos.enums.TipoTransaccion;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
@@ -17,51 +18,66 @@ public class egresoVista extends JPanel {
     private JButton btnNuevo, btnActualizar, btnEliminar, btnEditar;
 
     public egresoVista() {
-        setLayout(new BorderLayout());
+        super(new BorderLayout());
         setBackground(Color.WHITE);
 
-        // ============ BOTONES SUPERIORES ============
-        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelBotones.setBackground(Color.WHITE);
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBackground(Color.WHITE);
+        mainPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
 
-        btnNuevo = crearBoton("Nuevo Egreso", new Color(46, 204, 113));
-        btnEditar = crearBoton("Editar", new Color(241, 196, 15));
-        btnEliminar = crearBoton("Eliminar", new Color(231, 76, 60));
+// ================= CABECERA =================
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(Color.WHITE);
+        headerPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
 
-        panelBotones.add(btnNuevo);
-        panelBotones.add(btnEditar);
-        panelBotones.add(btnEliminar);
+        JLabel titleLabel = new JLabel("Egreso");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setForeground(new Color(50, 50, 50));
+        headerPanel.add(titleLabel, BorderLayout.WEST);
 
-        add(panelBotones, BorderLayout.NORTH);
+        mainPanel.add(headerPanel, BorderLayout.NORTH);
 
-        // ============ TABLA ============
+// ================= TABLA =================
         tablaEgresos = new JTable();
         modeloTabla = new DefaultTableModel(
-                new String[]{"ID", "Fecha", "Tipo", "Categoría", "Detalle", "Cantidad", "Monto"},
+                new String[]{"ID", "Fecha", "Tipo", "Referencia", "Detalle", "Cantidad", "Monto"},
                 0
         );
         tablaEgresos.setModel(modeloTabla);
         tablaEgresos.setRowHeight(30);
 
-        add(new JScrollPane(tablaEgresos), BorderLayout.CENTER);
+        mainPanel.add(new JScrollPane(tablaEgresos), BorderLayout.CENTER);
 
-        // ============ EVENTOS ============
+// ================= BOTONES ABAJO =================
+        JPanel botonesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
+        botonesPanel.setBackground(Color.WHITE);
 
-        // NUEVO
+        btnNuevo = crearBoton("Nuevo Egreso", new Color(46, 204, 113));
+        btnEditar = crearBoton("Editar", new Color(241, 196, 15));
+        btnEliminar = crearBoton("Eliminar", new Color(231, 76, 60));
+
+        botonesPanel.add(btnNuevo);
+        botonesPanel.add(btnEditar);
+        botonesPanel.add(btnEliminar);
+
+        mainPanel.add(botonesPanel, BorderLayout.SOUTH);
+
+// ================= AÑADIR AL PANEL PRINCIPAL =================
+        add(mainPanel);
+
+// ================= EVENTOS =================
         btnNuevo.addActionListener(e -> {
             JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
             new EgresoSeleccionMenu(parent, this).setVisible(true);
         });
 
-        // EDITAR (AQUÍ ES DONDE SE AGREGA LA LÓGICA QUE PEDISTE)
         btnEditar.addActionListener(e -> editar());
-
-
-        // ELIMINAR
         btnEliminar.addActionListener(e -> eliminar());
 
-        // CARGAR
+// CARGAR TABLA
         recargarTabla();
+
+
     }
 
     // ====================================================
@@ -88,11 +104,18 @@ public class egresoVista extends JPanel {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         for (Transaccion t : lista) {
+            String referencia = "";
+            if (t.getProducto() != null) referencia = t.getProducto().getNombreProducto();
+            else if (t.getCultivo() != null) referencia = t.getCultivo().getNombreCultivo();
+            else if (t.getAnimal() != null) referencia = t.getAnimal().getNombre();
+                // si quieres, puedes poner algo genérico como "Lácteo" si no hay objeto
+            else referencia = t.getCategoria() != null ? t.getCategoria() : "-";
+
             modeloTabla.addRow(new Object[]{
                     t.getIdTransaccion(),
                     t.getFecha().format(formatter),
                     t.getTipo(),
-                    t.getCategoria() != null ? t.getCategoria() : "-",
+                    referencia,  // aquí reemplazamos "Categoría" por la referencia
                     t.getDescripcion(),
                     t.getCantidad(),
                     t.getTotal()
@@ -126,11 +149,6 @@ public class egresoVista extends JPanel {
         }
 
         JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
-
-        // ============================
-        // ABRIR FORMULARIO CORRECTO
-        // ============================
-
         if(t.getCultivo() != null){
             EgresoCultivoFormulario form = new EgresoCultivoFormulario(parent, this);
             form.cargarTransaccion(t); // <--- cargar datos
@@ -151,10 +169,6 @@ public class egresoVista extends JPanel {
         }
 
     }
-
-    // ====================================================
-    //  ELIMINAR (YA FUNCIONA)
-    // ====================================================
     private void eliminar() {
         int fila = tablaEgresos.getSelectedRow();
 
